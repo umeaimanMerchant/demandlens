@@ -47,8 +47,6 @@ The local forecasting engine, FastAPI backend, and initial dashboard have been i
 
 ## Workflow
 
-![alt text](image.png)
-
 
 
 ## Technology	What it does in DemandLens
