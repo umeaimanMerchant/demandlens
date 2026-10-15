@@ -108,12 +108,23 @@ def forecast_sales(
     ):
         raise ValueError("Promotion counts must be nonnegative integers")
 
-    history = artifact["history"].copy()
-    history["date"] = pd.to_datetime(history["date"]).dt.normalize()
 
     store_nbr = int(store_nbr)
     family = str(family)
     start_date = pd.Timestamp(start_date).normalize()
+
+    # Filter the original history first. Copy only the selected series.
+    raw_history = artifact["history"]
+
+    series = raw_history.loc[
+        raw_history["store_nbr"].eq(store_nbr)
+        & raw_history["family"].eq(family),
+        ["date", "sales"],
+    ].copy()
+
+    series["date"] = pd.to_datetime(series["date"]).dt.normalize()
+    series = series.sort_values("date")
+
 
     last_date = pd.Timestamp(artifact["last_train_date"]).normalize()
     expected_start = last_date + pd.Timedelta(days=1)
@@ -123,11 +134,6 @@ def forecast_sales(
             f"For this MVP, start_date must be {expected_start.date()}, "
             "the day after the latest observed sales."
         )
-
-    series = history.loc[
-        (history["store_nbr"].astype(int) == store_nbr)
-        & (history["family"].astype(str) == family)
-    ].sort_values("date")
 
     if series.empty:
         raise ValueError("Unknown store or product family combination")
