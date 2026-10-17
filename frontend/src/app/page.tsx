@@ -1,6 +1,12 @@
+// This is a client-side React component that provides a user interface for generating and displaying sales forecasts. 
+// It allows users to select a store number, product family, and forecast horizon, and 
+// then generates a forecast using an API endpoint. 
+// The results are displayed in a chart and a table, along with summary metrics.
 
-"use client";
 
+"use client"; // This directive indicates that the component should be rendered on the client side, enabling interactivity and state management.
+
+// The component imports necessary React hooks and Recharts components for rendering the chart.
 import { useMemo, useState } from "react";
 import {
   Area,
@@ -12,10 +18,12 @@ import {
   YAxis,
 } from "recharts";
 
+// The API_URL constant is set to the value of the NEXT_PUBLIC_API_URL environment variable if it exists, or defaults to "http://localhost:8000".
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
 ).replace(/\/+$/, "");
 
+// The FAMILIES array contains a list of product families that can be selected for forecasting.
 const FAMILIES = [
   "AUTOMOTIVE",
   "BABY CARE",
@@ -52,10 +60,14 @@ const FAMILIES = [
   "SEAFOOD",
 ];
 
+// The HORIZONS array contains the possible forecast horizons (in days) that can be selected by the user.
 const HORIZONS = [7, 14, 30] as const;
 
+// The Horizon type is defined as a union of the values in the HORIZONS array, which are 7, 14, and 30.
 type Horizon = (typeof HORIZONS)[number];
 
+// The ForecastDay type defines the structure of a single forecast day, 
+// including the date, store number, product family, number of promotions, predicted sales, and promotion assumption.
 type ForecastDay = {
   date: string;
   store_nbr: number;
@@ -65,10 +77,13 @@ type ForecastDay = {
   promotion_assumption: string;
 };
 
+// list of forecast days returned by the API is defined as ForecastResponse, which contains an array of ForecastDay objects.
 type ForecastResponse = {
   forecast: ForecastDay[];
 };
 
+// The formatDate function takes a date string in the format "YYYY-MM-DD" and returns a formatted date string in the format 
+// "Month Day, Year" or "Mon Day" if the short parameter is true.
 function formatDate(value: string, short = false) {
   const [year, month, day] = value.split("-").map(Number);
   const date = new Date(year, month - 1, day);
@@ -80,6 +95,7 @@ function formatDate(value: string, short = false) {
   }).format(date);
 }
 
+// The number function formats a numeric value with a specified number of decimal places,
 function number(value: number, decimals = 0) {
   return new Intl.NumberFormat("en-US", {
     maximumFractionDigits: decimals,
@@ -87,6 +103,9 @@ function number(value: number, decimals = 0) {
   }).format(value);
 }
 
+// Frontend components for the logo and metric cards are defined below. 
+// The Logo component displays the application logo and name, 
+// while the MetricCard component displays a single metric with a label, value, detail, and symbol.
 function Logo() {
   return (
     <div className="flex items-center gap-3">
@@ -152,6 +171,10 @@ function MetricCard({
   );
 }
 
+// Forecast generation logic is implemented in the Home component.
+
+// export default makes Home the module's primary export so Next.js can use it as the page component.
+// Inside it, you manage the state of the application.
 export default function Home() {
   const [store, setStore] = useState("1");
   const [family, setFamily] = useState("BEVERAGES");
@@ -160,6 +183,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // calaculates summary metrics (total, average, and peak predicted sales) from the forecast data using useMemo to optimize performance.
   const metrics = useMemo(() => {
     if (!forecast?.length) return null;
 
@@ -178,6 +202,8 @@ export default function Home() {
     };
   }, [forecast]);
 
+  // This function runs when the user triggers forecast generation. 
+  // It sends a POST request to the API with the selected store number, product family, and forecast horizon.
   async function generateForecast() {
     setLoading(true);
     setError("");
@@ -197,7 +223,8 @@ export default function Home() {
       });
 
       const data = await response.json();
-
+      // error handling for the API response is implemented here. 
+      // If the response is not OK, an error message is constructed based on the response data and thrown as an error.
       if (!response.ok) {
         const detail = data.detail;
         const message = Array.isArray(detail)
@@ -209,8 +236,10 @@ export default function Home() {
         throw new Error(message);
       }
 
+      // The response data is cast to the ForecastResponse type, 
       const result = data as ForecastResponse;
 
+      // The forecast data returned by the API is validated to ensure it is an array and has the expected length based on the selected horizon.
       if (
         !Array.isArray(result.forecast) ||
         result.forecast.length !== horizon
@@ -218,8 +247,11 @@ export default function Home() {
         throw new Error("The API returned an unexpected forecast response.");
       }
 
+      // If the API response is valid, the forecast state is updated with the new forecast data.
       setForecast(result.forecast);
-    } catch (err) {
+
+    } // If an error occurs during the fetch or processing of the API response, 
+    catch (err) {
       setError(
         err instanceof Error
           ? err.message
@@ -230,6 +262,8 @@ export default function Home() {
     }
   }
 
+
+// The component's JSX structure is defined below, including the sidebar, header, forecast configuration form, forecast results, and footer.
   return (
     <div className="min-h-screen bg-[#F5F7FA] text-slate-900">
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-[250px] flex-col bg-[#102A3A] px-5 py-7 lg:flex">

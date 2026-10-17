@@ -1,6 +1,8 @@
+"""
+This module contains the main sales forecasting logic, including feature construction and recursive prediction.
+"""
 
 from __future__ import annotations
-
 import numpy as np
 import pandas as pd
 
@@ -8,7 +10,7 @@ import pandas as pd
 ALLOWED_HORIZONS = {7, 14, 30}
 KEY_COLUMNS = ["date", "store_nbr", "family"]
 
-
+# get holiday data
 def _holiday_lookup(holidays: pd.DataFrame) -> dict:
     """Aggregate raw holiday events using the training-time definitions."""
     events = holidays.copy()
@@ -40,7 +42,7 @@ def _holiday_lookup(holidays: pd.DataFrame) -> dict:
 
     return daily.set_index("date").to_dict(orient="index")
 
-
+# create lag features
 def _lag_features(history_sales: list[float]) -> dict:
     """Calculate features from past actuals and previously generated predictions."""
     result = {}
@@ -69,7 +71,7 @@ def _lag_features(history_sales: list[float]) -> dict:
 
     return result
 
-
+# generate sales forecasts
 def forecast_sales(
     artifact: dict,
     store_nbr: int,
