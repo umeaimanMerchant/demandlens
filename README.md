@@ -1,5 +1,7 @@
 # DemandLens — Sales Forecasting Application
 
+<img width="1452" height="700" alt="image" src="https://github.com/user-attachments/assets/040d29f5-15d5-4dad-ba36-6dd99e82d5b1" />
+
 **From a machine learning model to a deployed web application**
 
 DemandLens is an end-to-end machine learning project that forecasts daily product-family sales for individual stores. It combines a cluster-based LightGBM forecasting engine, a Python FastAPI backend, and a Next.js frontend built with React and TypeScript.
@@ -18,6 +20,7 @@ The long-term vision is to help demand planners explore business assumptions and
 | API documentation | https://demandlens-api.onrender.com/docs |
 | Health endpoint | https://demandlens-api.onrender.com/health |
 | Dataset | [Kaggle Store Sales — Time Series Forecasting](https://www.kaggle.com/competitions/store-sales-time-series-forecasting/data) |
+| Youtube Playlist | [Build a Real AI App](https://www.youtube.com/playlist?list=PLVdOTK5KAPac) |
 
 > **Important:** DemandLens uses historical Favorita sales data from 2013–2017. Forecasts begin on August 16, 2017. This is a machine learning demonstration, not a live retail forecasting service. Predicted sales represent units, not revenue.
 
@@ -117,38 +120,8 @@ Next.js and React are not alternatives to JavaScript: React is the UI library, N
 
 The application separates the user interface from the machine learning service.
 
-```text
-                    USER
-                     |
-                     v
-          Next.js / React Frontend
-             Hosted on Netlify
-                     |
-             HTTP POST /forecast
-                     |
-                     v
-             FastAPI Backend
-              Hosted on Render
-                     |
-              Pydantic validation
-                     |
-                     v
-          Forecasting Python Module
-              forecasting.py
-                     |
-                     v
-         Saved LightGBM Model Artifact
-       Cluster Models + Historical Data
-                     |
-                     v
-          Recursive Daily Predictions
-                     |
-                     v
-               JSON Response
-                     |
-                     v
-          Frontend Metrics and Chart
-```
+<img width="1376" height="768" alt="image" src="https://github.com/user-attachments/assets/18067287-bc4a-45af-abb6-c6a4aafe38dd" />
+
 
 ### Request lifecycle
 
